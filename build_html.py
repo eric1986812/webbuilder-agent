@@ -3,7 +3,7 @@
 import markdown
 from pathlib import Path
 
-ROOT = Path("/Users/macadmin/Desktop/AI项目/海外网站开发Agent")
+ROOT = Path(__file__).parent
 MD_PATH = ROOT / "工作流-完整版.md"
 HTML_PATH = ROOT / "工作流-完整版.html"
 
