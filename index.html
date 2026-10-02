@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>海外网站开发 Agent — 项目入口</title>
+<style>
+:root {
+  --bg: #0b1020;
+  --bg-2: #0f172a;
+  --card: #131a30;
+  --line: #1f2a44;
+  --ink: #f8fafc;
+  --muted: #94a3b8;
+  --brand: #60a5fa;
+  --brand-2: #38bdf8;
+  --good: #34d399;
+  --warn: #fbbf24;
+  --bad: #f87171;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: linear-gradient(180deg, #0b1020 0%, #0a0e1a 100%);
+  color: var(--ink);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1080px; margin: 0 auto; padding: 56px 24px 80px; }
+
+.hero {
+  padding: 56px 40px;
+  background: radial-gradient(ellipse at top left, rgba(96,165,250,0.18), transparent 60%),
+              radial-gradient(ellipse at bottom right, rgba(56,189,248,0.12), transparent 60%),
+              var(--card);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  margin-bottom: 32px;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: rgba(96,165,250,0.15);
+  border: 1px solid rgba(96,165,250,0.35);
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--brand);
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--good);
+  box-shadow: 0 0 8px var(--good);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+h1 {
+  font-size: 44px;
+  line-height: 1.2;
+  margin: 0 0 16px;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero p { color: var(--muted); font-size: 17px; margin: 0; max-width: 640px; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 32px 0; }
+.card {
+  padding: 24px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  transition: transform 0.2s, border-color 0.2s;
+}
+.card:hover { transform: translateY(-2px); border-color: var(--brand); }
+.card .num {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--brand);
+  font-feature-settings: "tnum";
+  margin: 0;
+}
+.card .label {
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.card .item-title { font-size: 16px; font-weight: 600; margin: 12px 0 6px; }
+.card .item-desc { font-size: 13px; color: var(--muted); margin: 0; }
+
+h2 {
+  font-size: 26px;
+  margin: 56px 0 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+h2 .step {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  border-radius: 50%;
+  background: var(--brand);
+  color: var(--bg);
+  font-size: 14px;
+  font-weight: 700;
+}
+h3 { font-size: 18px; margin: 28px 0 12px; color: var(--brand-2); }
+h4 { font-size: 15px; margin: 20px 0 8px; color: var(--muted); font-weight: 600; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0 24px;
+  background: var(--card);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--line); font-size: 14px; }
+th { background: var(--bg-2); color: var(--brand); font-weight: 600; }
+tr:last-child td { border-bottom: none; }
+
+.tag {
+  display: inline-block;
+  padding: 2px 10px;
+  background: rgba(96,165,250,0.15);
+  color: var(--brand);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-right: 6px;
+}
+.tag.good { background: rgba(52,211,153,0.15); color: var(--good); }
+.tag.warn { background: rgba(251,191,36,0.15); color: var(--warn); }
+
+.phase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin: 24px 0;
+}
+.phase {
+  padding: 20px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+}
+.phase::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--brand), var(--brand-2));
+}
+.phase .p-num { font-size: 12px; color: var(--muted); font-weight: 600; letter-spacing: 0.05em; }
+.phase .p-name { font-size: 16px; font-weight: 600; margin: 6px 0; }
+.phase .p-time { font-size: 12px; color: var(--brand-2); }
+.phase .p-gate {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+ul, ol { padding-left: 22px; }
+li { margin: 6px 0; }
+
+code {
+  font-family: "SF Mono", Menlo, monospace;
+  background: var(--bg-2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: var(--brand);
+  border: 1px solid var(--line);
+}
+
+pre {
+  background: var(--bg-2);
+  color: var(--ink);
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.file-list { display: grid; grid-template-columns: 1fr; gap: 8px; }
+.file {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  transition: border-color 0.2s;
+}
+.file:hover { border-color: var(--brand); }
+.file-name { font-family: "SF Mono", Menlo, monospace; font-size: 14px; }
+.file-desc { color: var(--muted); font-size: 13px; }
+.file a {
+  color: var(--brand);
+  text-decoration: none;
+  font-size: 13px;
+  padding: 4px 12px;
+  border: 1px solid var(--brand);
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+.file a:hover { background: var(--brand); color: var(--bg); }
+
+.gate-box {
+  background: linear-gradient(135deg, rgba(251,191,36,0.1), transparent);
+  border: 1px solid rgba(251,191,36,0.3);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin: 16px 0;
+}
+.gate-box .gate-title { color: var(--warn); font-weight: 600; margin-bottom: 8px; }
+
+@media (max-width: 720px) {
+  .wrap { padding: 24px 16px 60px; }
+  .hero { padding: 32px 24px; }
+  h1 { font-size: 28px; }
+  h2 { font-size: 20px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <span class="badge">Mavis 内置 Agent · 已启用</span>
+    <h1>海外网站开发 Agent</h1>
+    <p>从市场调研到部署上线，7 阶段全链路。15-27 天出一个可对外收钱的 MSP，老板总投入约 13 小时拍板。</p>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <p class="num">7</p>
+      <p class="label">完整阶段</p>
+      <p class="item-desc">调研 → 选项目 → PRD → 技术 → 编码 → 测试 → 部署</p>
+    </div>
+    <div class="card">
+      <p class="num">15-27<span style="font-size:18px;color:#94a3b8">天</span></p>
+      <p class="label">出一个 MSP</p>
+      <p class="item-desc">最小可售产品，老板按 OPC 低风险偏好设计</p>
+    </div>
+    <div class="card">
+      <p class="num">~13<span style="font-size:18px;color:#94a3b8">h</span></p>
+      <p class="label">老板总投入</p>
+      <p class="item-desc">零散拍板，每天 &lt; 1 小时</p>
+    </div>
+    <div class="card">
+      <p class="num">8<span style="margin-left:8px" class="tag good">已创建</span></p>
+      <p class="label">系统提示词长度</p>
+      <p class="item-desc">3.4 KB · 已写入 Mavis</p>
+    </div>
+  </div>
+
+  <h2><span class="step">1</span> 工作流（7 阶段 + 持续运营）</h2>
+
+  <div class="phase-grid">
+    <div class="phase">
+      <div class="p-num">PHASE 01</div>
+      <div class="p-name">市场调研</div>
+      <div class="p-time">3-5 天</div>
+      <div class="p-gate">🎯 老板拍板：做不做这个赛道</div>
+    </div>
+    <div class="phase">
+      <div class="p-num">PHASE 02</div>
+      <div class="p-name">项目筛选</div>
+      <div class="p-time">1-2 天</div>
+      <div class="p-gate">🎯 老板拍板：MSP 范围对不对</div>
+    </div>
+    <div class="phase">
+      <div class="p-num">PHASE 03</div>
+      <div class="p-name">PRD</div>
+      <div class="p-time">2-3 天</div>
+      <div class="p-gate">🎯 老板拍板：PRD 范围对不对</div>
+    </div>
+    <div class="phase">
+      <div class="p-num">PHASE 04</div>
+      <div class="p-name">技术文档</div>
+      <div class="p-time">1-2 天</div>
+      <div class="p-gate">🎯 老板拍板：技术栈对不对</div>
+    </div>
+    <div class="phase">
+      <div class="p-num">PHASE 05</div>
+      <div class="p-name">编码实现</div>
+      <div class="p-time">5-10 天</div>
+      <div class="p-gate">🎯 老板拍板：Logo/主页/定价</div>
+    </div>
+    <div class="phase">
+      <div class="p-num">PHASE 06</div>
+      <div class="p-name">测试</div>
+      <div class="p-time">2-3 天</div>
+      <div class="p-gate">🎯 老板拍板：可以上线吗</div>
+    </div>
+    <div class="phase">
+      <div class="p-num">PHASE 07</div>
+      <div class="p-name">部署上线</div>
+      <div class="p-time">1-2 天</div>
+      <div class="p-gate">🎯 老板拍板：上线文案 OK 吗</div>
+    </div>
+    <div class="phase">
+      <div class="p-num">PHASE 08</div>
+      <div class="p-name">运营</div>
+      <div class="p-time">持续</div>
+      <div class="p-gate">📊 周数据 / 月复盘</div>
+    </div>
+  </div>
+
+  <div class="gate-box">
+    <div class="gate-title">⛔ Phase Gate 规则（不可破坏）</div>
+    每个阶段结束后必须有 <strong>GO / NO-GO 决策点</strong>，老板拍板才能推进。即使老板说"继续"，也要走 Gate。绝对不能自动推进。
+  </div>
+
+  <h2><span class="step">2</span> 默认工具链</h2>
+
+  <table>
+    <thead>
+      <tr><th>层</th><th>技术</th><th>备选</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>前端</td><td>Next.js 14 (App Router)</td><td>Remix / Nuxt 3</td></tr>
+      <tr><td>UI</td><td>Tailwind + shadcn/ui</td><td>MUI / Chakra</td></tr>
+      <tr><td>后端</td><td>Next.js API Routes / tRPC</td><td>Express / Hono / FastAPI</td></tr>
+      <tr><td>数据库</td><td>Supabase (Postgres + Auth)</td><td>PlanetScale / Neon</td></tr>
+      <tr><td>支付</td><td>Stripe Checkout</td><td>Creem / Lemon Squeezy</td></tr>
+      <tr><td>部署</td><td>Vercel</td><td>Cloudflare Pages / Fly.io</td></tr>
+      <tr><td>分析</td><td>Plausible</td><td>PostHog / Umami</td></tr>
+      <tr><td>邮件</td><td>Resend</td><td>SendGrid</td></tr>
+      <tr><td>监控</td><td>Sentry</td><td>LogRocket</td></tr>
+      <tr><td>CDN</td><td>Cloudflare</td><td>Bunny.net</td></tr>
+      <tr><td>E2E 测试</td><td>Playwright</td><td>Cypress</td></tr>
+      <tr><td>ORM</td><td>Prisma / Drizzle</td><td>Kysely</td></tr>
+    </tbody>
+  </table>
+
+  <h2><span class="step">3</span> 老板的硬约束（Agent 必遵守）</h2>
+
+  <ol>
+    <li><strong>承诺必须可实现</strong> — PRD 里写了什么，代码里必须有</li>
+    <li><strong>简化定价</strong> — 少即是多，不造 3-5 档"伪差异化"</li>
+    <li><strong>不造假数据</strong> — 用户数 / ARR / 证言必须真实</li>
+    <li><strong>联动解决一类问题</strong> — 不要一个问题只修一次</li>
+    <li><strong>先验证再继续</strong> — 每个阶段必须有验证产物</li>
+    <li><strong>工程纪律</strong> — 每次改动 commit + 写测试</li>
+  </ol>
+
+  <h2><span class="step">4</span> Mavis Agent 配置（已启用）</h2>
+
+  <table>
+    <tr><th>agent_name</th><td><code>webbuilder</code></td></tr>
+    <tr><th>display_name</th><td>海外网站开发Agent</td></tr>
+    <tr><th>description</th><td>专门开发海外网站的 Agent：市场调研 → 选项目 → PRD → 技术文档 → 编码 → 测试 → 部署全链路</td></tr>
+    <tr><th>system_prompt 长度</th><td>3.4 KB（3419 字符）</td></tr>
+    <tr><th>persona</th><td>Direct, evidence-driven, never invent features</td></tr>
+    <tr><th>config 路径</th><td><code>/Users/macadmin/.mavis/agents/webbuilder/</code></td></tr>
+    <tr><th>调用方式</th><td>在 Mavis 里直接说"开工"/"做个网站"</td></tr>
+  </table>
+
+  <h2><span class="step">5</span> 文件清单</h2>
+
+  <div class="file-list">
+    <div class="file">
+      <div>
+        <div class="file-name">README.md</div>
+        <div class="file-desc">项目说明（老板/团队/投资人看）</div>
+      </div>
+      <a href="README.md">查看 →</a>
+    </div>
+    <div class="file">
+      <div>
+        <div class="file-name">AGENTS.md</div>
+        <div class="file-desc">项目根规范（Claude Code / Cursor / Aider 必读）</div>
+      </div>
+      <a href="AGENTS.md">查看 →</a>
+    </div>
+    <div class="file">
+      <div>
+        <div class="file-name">SKILL.md</div>
+        <div class="file-desc">Skill 加载格式（含 YAML frontmatter）</div>
+      </div>
+      <a href="SKILL.md">查看 →</a>
+    </div>
+    <div class="file">
+      <div>
+        <div class="file-name">system-prompt.md</div>
+        <div class="file-desc">Agent 系统提示词（直接复制到任意 Chat）</div>
+      </div>
+      <a href="system-prompt.md">查看 →</a>
+    </div>
+    <div class="file">
+      <div>
+        <div class="file-name">工作流-完整版.md</div>
+        <div class="file-desc">7 阶段完整文档（输入/输出/工具/风险）</div>
+      </div>
+      <a href="工作流-完整版.md">查看 →</a>
+    </div>
+    <div class="file">
+      <div>
+        <div class="file-name">工作流-完整版.html</div>
+        <div class="file-desc">工作流 HTML 版（带样式，浏览器看）</div>
+      </div>
+      <a href="工作流-完整版.html">查看 →</a>
+    </div>
+    <div class="file">
+      <div>
+        <div class="file-name">build_html.py</div>
+        <div class="file-desc">md → HTML 转换脚本（改文档后跑一次）</div>
+      </div>
+      <a href="build_html.py">查看 →</a>
+    </div>
+    <div class="file">
+      <div>
+        <div class="file-name">workspace/</div>
+        <div class="file-desc">各项目工作目录（每个新项目一个子文件夹）</div>
+      </div>
+      <span class="tag warn">运行时创建</span>
+    </div>
+  </div>
+
+  <h2><span class="step">6</span> 下一步</h2>
+
+  <ol>
+    <li>在 Mavis 里启用 webbuilder agent → <span class="tag good">已创建</span></li>
+    <li>老板跟 webbuilder 说"<strong>开工</strong>"</li>
+    <li>确认目标地区 + 赛道方向</li>
+    <li>webbuilder 创建 <code>workspace/&lt;项目名&gt;-&lt;日期&gt;/</code> 子目录</li>
+    <li>开始 Phase 1 · 市场调研</li>
+  </ol>
+
+  <div class="gate-box" style="margin-top: 40px;">
+    <div class="gate-title">💡 启动命令</div>
+    在 Mavis 里直接说："<strong>开工，做一个 AI 简历优化工具，目标北美</strong>"
+    <br><br>
+    或者：直接说"<strong>跳到 Phase 3</strong>"——如果老板已确定项目方向。
+  </div>
+
+  <p style="text-align: center; color: var(--muted); margin-top: 60px; font-size: 13px;">
+    海外网站开发 Agent v1.0 · 创建于 2026-10-02 · 由 Mavis 打包
+  </p>
+
+</div>
+</body>
+</html>

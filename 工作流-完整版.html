@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>海外网站开发 Agent — 完整工作流 v1.0</title>
+<style>
+:root {
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --line: #e2e8f0;
+  --brand: #2563eb;
+  --brand-soft: #dbeafe;
+  --accent: #f59e0b;
+  --good: #16a34a;
+  --bad: #dc2626;
+  --warn: #f97316;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1080px; margin: 0 auto; padding: 40px 28px 80px; }
+
+h1 { font-size: 36px; line-height: 1.3; margin: 0 0 12px; letter-spacing: -0.02em; }
+h2 {
+  font-size: 26px;
+  margin: 56px 0 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--line);
+}
+h3 { font-size: 20px; margin: 32px 0 12px; color: var(--brand); }
+h4 { font-size: 16px; margin: 24px 0 8px; color: var(--muted); }
+
+blockquote {
+  margin: 16px 0;
+  padding: 16px 20px;
+  background: var(--brand-soft);
+  border-left: 4px solid var(--brand);
+  border-radius: 0 8px 8px 0;
+  color: #1e3a8a;
+}
+blockquote p { margin: 4px 0; }
+
+p { margin: 12px 0; }
+strong { color: var(--ink); font-weight: 700; }
+em { color: var(--muted); }
+
+hr { border: none; border-top: 1px dashed var(--line); margin: 32px 0; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0 24px;
+  background: var(--card);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(15,23,42,0.06);
+}
+th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--line); font-size: 14px; }
+th { background: #f1f5f9; color: var(--ink); font-weight: 600; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #f8fafc; }
+
+ul, ol { padding-left: 22px; }
+li { margin: 6px 0; }
+
+code {
+  font-family: "SF Mono", Menlo, monospace;
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #be185d;
+}
+
+pre {
+  background: #0f172a;
+  color: #f1f5f9;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+}
+pre code { background: transparent; color: inherit; padding: 0; }
+
+.meta {
+  background: var(--card);
+  padding: 20px;
+  border-radius: 12px;
+  margin: 16px 0 32px;
+  border: 1px solid var(--line);
+}
+.meta p { margin: 4px 0; color: var(--muted); font-size: 14px; }
+
+.toc {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 20px 28px;
+  margin: 24px 0 40px;
+}
+.toc h4 { margin: 0 0 12px; color: var(--ink); }
+.toc ul { columns: 2; column-gap: 32px; padding-left: 20px; }
+.toc li { break-inside: avoid; font-size: 14px; }
+
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-right: 6px;
+}
+
+@media (max-width: 720px) {
+  .wrap { padding: 20px 16px 60px; }
+  h1 { font-size: 26px; }
+  h2 { font-size: 20px; }
+  .toc ul { columns: 1; }
+  table { font-size: 13px; }
+  th, td { padding: 8px 10px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1 id="agent-v10">海外网站开发 Agent — 完整工作流 v1.0</h1>
+<blockquote>
+<p><strong>定位</strong>：能主动完成 <strong>市场调研 → 选项目 → PRD → 技术文档 → 编码 → 测试 → 部署</strong> 整链路的海外网站开发 Agent。<br />
+<strong>目标用户</strong>：OPC 创业者 / 超级个体 / 想做出海 SaaS / 工具站的人。<br />
+<strong>设计原则</strong>：MSP &gt; MVP，每个 Phase 都有明确 Gate，进可攻退可守。</p>
+</blockquote>
+<hr />
+<h2 id="0-agent">0. Agent 能力清单（一次说清能干什么）</h2>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>是否支持</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>海外市场调研（行业 / 竞品 / 政策）</td>
+<td>✅</td>
+<td>输出物：行业分析.md</td>
+</tr>
+<tr>
+<td>项目方向筛选（决策矩阵）</td>
+<td>✅</td>
+<td>输出物：候选项目.md</td>
+</tr>
+<tr>
+<td>PRD 撰写（用户故事 / IA / 验收标准）</td>
+<td>✅</td>
+<td>输出物：PRD-v1.md</td>
+</tr>
+<tr>
+<td>技术文档（架构 / 数据模型 / API / 部署）</td>
+<td>✅</td>
+<td>输出物：TECH-SPEC.md</td>
+</tr>
+<tr>
+<td>编码实现（前端 / 后端 / DB / 集成）</td>
+<td>✅</td>
+<td>输出物：完整代码 + commit</td>
+</tr>
+<tr>
+<td>E2E 测试 / 性能 / 兼容</td>
+<td>✅</td>
+<td>输出物：测试报告</td>
+</tr>
+<tr>
+<td>部署上线（域名 / DNS / SSL / CDN / 监控）</td>
+<td>✅</td>
+<td>输出物：上线 URL</td>
+</tr>
+<tr>
+<td>SEO 提交 / GSC / BM</td>
+<td>✅</td>
+<td>输出物：收录确认</td>
+</tr>
+<tr>
+<td>数据埋点 / 用户反馈收集</td>
+<td>✅</td>
+<td>输出物：Dashboard</td>
+</tr>
+<tr>
+<td>持续迭代（A/B / 新版本发布）</td>
+<td>✅</td>
+<td>输出物：版本日志</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="1-7">1. 工作流总览（7 大阶段）</h2>
+<pre><code>Phase 1          Phase 2           Phase 3        Phase 4          Phase 5         Phase 6         Phase 7
+市场调研   →     项目筛选    →     PRD       →    技术文档   →     编码实现  →     测试验证   →    部署上线
+Market           Project           Product       Tech Spec         Code            QA              Deploy
+Research         Selection         Spec
+   │                │                │              │                │                │                │
+   ▼                ▼                ▼              ▼                ▼                ▼                ▼
+3-5天              1-2天            2-3天          1-2天            5-10天          2-3天            1-2天
+                                                                       ───── 持续 ─────
+总耗时：约 15-27 天出一个 MSP（最小可售产品）
+</code></pre>
+<p><strong>每个 Phase 结束时都有"继续 / 调整 / 暂停"的决策 Gate</strong>，避免让老板烧完一轮才发现方向错。</p>
+<hr />
+<h2 id="phase-1market-research3-5">Phase 1：市场调研（Market Research，3-5 天）</h2>
+<h3 id="11">1.1 目标地区与赛道初筛</h3>
+<ul>
+<li><strong>输入</strong>：老板指定 / 行业关键词 / 目标语言（出海英文 / 日文 / 西语）</li>
+<li><strong>工作内容</strong>：<br />
+  1. 选定 1 个目标地区（北美 / 欧洲 / 东南亚 / 全球英文）<br />
+  3. 选定 1-3 个赛道方向<br />
+  4. 调研该地区的 AI 工具接受度、付费习惯、流量结构</li>
+<li><strong>输出</strong>：<code>01-市场大盘.md</code>（包含地区 / 赛道初筛 + 付费力 / 流量结构）</li>
+<li><strong>工具</strong>：</li>
+<li><strong>网络搜索</strong>（Google / 行业报告 / Statista / G2）</li>
+<li><strong>数据源</strong>：真实或仿真数据；不编造数字</li>
+<li><strong>变现研究</strong>：Similarweb / G2 排行榜</li>
+<li><strong>时间</strong>：1 天</li>
+<li><strong>关键风险</strong>：选错地区（北美合规成本、印度懒付）—— <strong>优先海外能做的服务（北美 + 欧洲英文为主）</strong></li>
+<li><strong>老板参与</strong>：拍板"这个赛道做不做"</li>
+</ul>
+<h3 id="12">1.2 用户画像 / 痛点调研</h3>
+<ul>
+<li><strong>输入</strong>：赛道方向</li>
+<li><strong>工作内容</strong>：<br />
+  1. 采集 30-50 条真实用户反馈（Reddit / Product Hunt 评论 / G2 评论）<br />
+  2. 提炼 3-5 个核心痛点<br />
+  3. 描出 1-2 个典型用户画像（Persona）</li>
+<li><strong>输出</strong>：<code>02-用户画像.md</code>（Persona × 痛点矩阵）</li>
+<li><strong>工具</strong>：Reddit API / Product Hunt / G2 / 论坛</li>
+<li><strong>时间</strong>：1 天</li>
+<li><strong>关键风险</strong>：用户样本偏执 → <strong>优先采公开真实社区里的用户反馈</strong></li>
+<li><strong>老板参与</strong>：审 Persona 是否符合老板直觉</li>
+</ul>
+<h3 id="13">1.3 竞品地图</h3>
+<ul>
+<li><strong>输入</strong>：赛道方向</li>
+<li><strong>工作内容</strong>：<br />
+  1. 拉出 8-15 家竞品（同类 / 周边 / 上下游）<br />
+  2. 按"功能 / 价格 / 用户量 / 口碑"四维评估<br />
+  3. 拆解竞品的商业模型（Freemium / 订阅 / 广告 / 一次性）<br />
+  4. 挖护城河 / 弱点</li>
+<li><strong>输出</strong>：<code>03-竞品地图.md</code>（包含对比表 + 差异化机会点）</li>
+<li><strong>工具</strong>：Similarweb / G2 / Crunchbase / 竞品官网</li>
+<li><strong>时间</strong>：1-2 天</li>
+<li><strong>关键风险</strong>：只看出价好车的护城河、不看弱点 → <strong>一定要问"为什么老用户会跳"</strong></li>
+<li><strong>老板参与</strong>：拍板差异点是否老板要背</li>
+</ul>
+<h3 id="14">1.4 合规 / 政策风险扫描</h3>
+<ul>
+<li><strong>输入</strong>：目标地区 + 业务类型</li>
+<li><strong>工作内容</strong>：<br />
+  1. 调研 GDPR（欧洲用户）、COPPA（儿童）、COPPA、广告法（FDA/FTC）、ICP（中文）等<br />
+  2. 调研是否需 ICP 备案 / Apple 开发者账号 / 公司主体<br />
+  3. 调研税务（VAT / 销售税 / 跨境收款）</li>
+<li><strong>输出</strong>：<code>04-合规清单.md</code>（合规 + 主体 + 收款策略）</li>
+<li><strong>工具</strong>：官方文档 / 律所文章 / 实际备案路径</li>
+<li><strong>时间</strong>：0.5-1 天</li>
+<li><strong>关键风险</strong>：不做合规调研直接上线 → <strong>永久收益受损</strong>、账号被封</li>
+<li><strong>老板参与</strong>：拍板主体（个人 / 公司 / 香港 / 美国 LLC）</li>
+</ul>
+<h3 id="15-phase-1-gate">1.5 Phase 1 Gate（决策点）</h3>
+<ul>
+<li><strong>继续条件</strong>：赛道明确 + 有 3-5 个竞品 + 至少 1 个差异点 + 合规可行</li>
+<li><strong>暂停条件</strong>：赛道过大 / 0 竞品（可能没市场） / 合规不可行</li>
+<li><strong>输出</strong>：<code>00-GO-结构化记录.md</code>，包含 GO / NO-GO 判断</li>
+</ul>
+<hr />
+<h2 id="phase-2project-selection1-2">Phase 2：项目筛选（Project Selection，1-2 天）</h2>
+<h3 id="21">2.1 决策矩阵（老板拍板）</h3>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>权重</th>
+<th>评分标准</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>市场大小（Top 10% 市场规模）</td>
+<td>20%</td>
+<td>总用户量 / ARR 潜力</td>
+</tr>
+<tr>
+<td>竞争激烈度</td>
+<td>15%</td>
+<td>头部 5 家各占多少</td>
+</tr>
+<tr>
+<td>老板兴趣 / 理解度</td>
+<td>20%</td>
+<td>"能不能讲清楚是什么"</td>
+</tr>
+<tr>
+<td>技术可行性</td>
+<td>20%</td>
+<td>"AI 能干多少 / 需要多少人工"</td>
+</tr>
+<tr>
+<td>资源匹配</td>
+<td>15%</td>
+<td>现金流 / 时间 / 招聘可行性</td>
+</tr>
+<tr>
+<td>长期护城河</td>
+<td>10%</td>
+<td>"能否 6 个月防重复"</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>输出</strong>：<code>05-决策矩阵.md</code>（加权打分 + TOP 3 候选）</li>
+</ul>
+<h3 id="22-msp-4-7">2.2 MSP 定义（4-7 天可出）</h3>
+<ul>
+<li><strong>输入</strong>：TOP 1 项目</li>
+<li><strong>工作内容</strong>：只留 1 个核心场景 + 1-2 个核心功能 + 1 个最简支付通路</li>
+<li><strong>输出</strong>：<code>06-MSP定义.md</code>（一个 <code>Goal / Non-Goal</code> + 用户故事 × 3）</li>
+</ul>
+<h3 id="23">2.3 退出 / 继续决策</h3>
+<ul>
+<li><strong>继续条件</strong>：加权打分 ≥ 70 / 技术可行性 ≥ 80</li>
+<li><strong>暂停条件</strong>：财务预估 ≤ 6 个月不能回本 / 技术需要外包 / 老板不熟悉</li>
+<li><strong>老板参与</strong>：100% 拍板（这是老板的钱和时间）</li>
+</ul>
+<hr />
+<h2 id="phase-3prdproduct-spec2-3">Phase 3：PRD（Product Spec，2-3 天）</h2>
+<h3 id="31-user-story">3.1 用户故事（User Story）</h3>
+<ul>
+<li><strong>格式</strong>：<code>As a [user], I want to [action], so that [benefit]</code></li>
+<li><strong>数量</strong>：8-15 条</li>
+<li><strong>优先级</strong>：MoSCoW（Must / Should / Could / Won't）</li>
+<li><strong>输出</strong>：<code>07-PRD-用户故事.md</code></li>
+</ul>
+<h3 id="32-user-flow">3.2 用户体验流程（User Flow）</h3>
+<ul>
+<li><strong>输入</strong>：核心场景 × 1</li>
+<li><strong>工作内容</strong>：画出用户从进入 → 注册 → 付费 → 达成核心环节的全部路径</li>
+<li><strong>工具</strong>：Mermaid / Figma / Draw.io</li>
+<li><strong>输出</strong>：<code>08-用户流程图.md</code>（包含 Mermaid 代码 + 解释）</li>
+</ul>
+<h3 id="33-ia">3.3 信息架构（IA）</h3>
+<ul>
+<li><strong>输入</strong>：用户故事 + 流程</li>
+<li><strong>工作内容</strong>：列出所有页面 / URL / 路由</li>
+<li><strong>输出</strong>：<code>09-IA.md</code>（sitemap + 路由表）</li>
+</ul>
+<h3 id="34-acceptance-criteria">3.4 验收标准（Acceptance Criteria）</h3>
+<ul>
+<li><strong>格式</strong>：<code>Given / When / Then</code></li>
+<li><strong>每个流程配 1 套验收标准</strong></li>
+<li><strong>输出</strong>：<code>10-验收标准.md</code></li>
+</ul>
+<h3 id="35-nfr">3.5 非功能需求（NFR）</h3>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>指标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>性能</td>
+<td>LCP &lt; 2.5s / FID &lt; 100ms / CLS &lt; 0.1</td>
+</tr>
+<tr>
+<td>可访问性</td>
+<td>WCAG 2.1 AA</td>
+</tr>
+<tr>
+<td>SEO</td>
+<td>Lighthouse SEO ≥ 95</td>
+</tr>
+<tr>
+<td>兼容性</td>
+<td>主流移动端 + 桌面浏览器</td>
+</tr>
+<tr>
+<td>国际化</td>
+<td>至少 2 语言（EN + 1 其他）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="36">3.6 数据与隐私</h3>
+<ul>
+<li>用户数据收集清单（必需 / 可选）</li>
+<li>隐私政策 / Cookie 政策 / 服务条款</li>
+</ul>
+<h3 id="37">3.7 商业化设计</h3>
+<ul>
+<li>定价方案（老板偏好：少即是多）</li>
+<li>支付通路（Stripe / Lemon Squeezy / Creem）</li>
+<li>退款 / 退订策略</li>
+</ul>
+<h3 id="38-phase-3-gate">3.8 Phase 3 Gate</h3>
+<ul>
+<li><strong>继续条件</strong>：用户故事有 8-15 条 / 流程图清晰 / NFR 可达</li>
+<li><strong>暂停条件</strong>：流程复杂到 7 天内不可完成 → <strong>回到 Phase 2 简化 MSP</strong></li>
+</ul>
+<hr />
+<h2 id="phase-4tech-spec1-2">Phase 4：技术文档（Tech Spec，1-2 天）</h2>
+<h3 id="41">4.1 技术栈选型</h3>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>推荐</th>
+<th>备选</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>前端</td>
+<td>Next.js 14 (App Router)</td>
+<td>Remix / Nuxt 3</td>
+</tr>
+<tr>
+<td>UI</td>
+<td>Tailwind CSS + shadcn/ui</td>
+<td>MUI / Chakra</td>
+</tr>
+<tr>
+<td>后端</td>
+<td>Next.js API Routes</td>
+<td>Express / Hono / FastAPI</td>
+</tr>
+<tr>
+<td>数据库</td>
+<td>Supabase (Postgres + Auth)</td>
+<td>PlanetScale / Neon</td>
+</tr>
+<tr>
+<td>支付</td>
+<td>Stripe Checkout</td>
+<td>Lemon Squeezy / Creem</td>
+</tr>
+<tr>
+<td>部署</td>
+<td>Vercel</td>
+<td>Cloudflare Pages / Fly.io</td>
+</tr>
+<tr>
+<td>分析</td>
+<td>Plausible</td>
+<td>PostHog / Umami</td>
+</tr>
+<tr>
+<td>邮件</td>
+<td>Resend</td>
+<td>SendGrid</td>
+</tr>
+<tr>
+<td>监控</td>
+<td>Sentry</td>
+<td>LogRocket</td>
+</tr>
+<tr>
+<td>CDN</td>
+<td>Cloudflare</td>
+<td>Bunny.net</td>
+</tr>
+</tbody>
+</table>
+<h3 id="42">4.2 系统架构图</h3>
+<ul>
+<li>客户端（Web）→ 反代 → 业务服务 → 数据库</li>
+<li>第三方服务依赖（OAuth / 支付 / 邮件）</li>
+<li>部署拓扑图</li>
+</ul>
+<h3 id="43">4.3 数据模型</h3>
+<ul>
+<li>ER 图（Mermaid）</li>
+<li>表 / 字段 / 类型 / 索引 / 约束</li>
+<li>Row Level Security 策略（如用 Supabase）</li>
+</ul>
+<h3 id="44-api">4.4 API 设计</h3>
+<ul>
+<li>RESTful / tRPC，要根据选型</li>
+<li>OpenAPI 文档</li>
+<li>错误码表 / 限流策略</li>
+</ul>
+<h3 id="45">4.5 安全 / 合规 / 性能指标</h3>
+<ul>
+<li>HTTPS / CSP / HSTS / X-Frame-Options</li>
+<li>OWASP Top 10 自查</li>
+<li>性能指标：LCP / FID / CLS / TTFB</li>
+<li>限流 / 防滥用策略</li>
+</ul>
+<h3 id="46">4.6 部署架构</h3>
+<ul>
+<li>域名购买 / DNS / SSL</li>
+<li>CI/CD（GitHub Actions）</li>
+<li>灰度发布策略</li>
+<li>监控告警（Sentry / Plausible / UptimeRobot）</li>
+</ul>
+<h3 id="47">4.7 第三方服务清单</h3>
+<table>
+<thead>
+<tr>
+<th>服务</th>
+<th>用途</th>
+<th>成本</th>
+<th>备选</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stripe</td>
+<td>支付</td>
+<td>2.9% + 0.3</td>
+<td>Creem（0 费率但限 10K/月）</td>
+</tr>
+<tr>
+<td>Plausible</td>
+<td>分析</td>
+<td>$9/月</td>
+<td>Umami（自托管免费）</td>
+</tr>
+<tr>
+<td>Resend</td>
+<td>邮件</td>
+<td>$20/月/20K 封</td>
+<td>SendGrid</td>
+</tr>
+<tr>
+<td>Vercel</td>
+<td>部署</td>
+<td>免费层可用</td>
+<td>Cloudflare Pages</td>
+</tr>
+<tr>
+<td>Supabase</td>
+<td>数据库</td>
+<td>免费层可用</td>
+<td>Neon</td>
+</tr>
+<tr>
+<td>Sentry</td>
+<td>监控</td>
+<td>免费层可用</td>
+<td>GlitchTip</td>
+</tr>
+</tbody>
+</table>
+<h3 id="48-phase-4-gate">4.8 Phase 4 Gate</h3>
+<ul>
+<li><strong>继续条件</strong>：技术栈与老板资源匹配 / 第三方服务可接 / 部署路径明确</li>
+<li><strong>暂停条件</strong>：需要招聘 / 服务不可接 / 老板资源不够 → <strong>换技术栈或换项目</strong></li>
+</ul>
+<hr />
+<h2 id="phase-5implementation5-10">Phase 5：编码实现（Implementation，5-10 天）</h2>
+<h3 id="51">5.1 项目初始化</h3>
+<ul>
+<li>脚手架（<code>create-next-app</code> / Vite）</li>
+<li>目录结构 / Git 初始化 / .gitignore</li>
+<li>ESLint / Prettier / TypeScript 配置</li>
+<li>基础配置（环境变量 / tsconfig / tailwind.config）</li>
+</ul>
+<h3 id="52-schema-api">5.2 数据库 schema + 后端 API</h3>
+<ul>
+<li>建库 SQL / 迁移脚本</li>
+<li>RLS 策略</li>
+<li>API 路由实现（按 PRD 验收标准）</li>
+<li>OpenAPI 文档</li>
+</ul>
+<h3 id="53-ui">5.3 前端 UI 实现</h3>
+<ul>
+<li>设计：颜色 / 字体 / 间距 / 动效系统</li>
+<li>组件库搭建（shadcn/ui）</li>
+<li>页面（landing / onboarding / dashboard / settings / billing）</li>
+<li>响应式 / 暗色模式</li>
+<li>多语言（i18n）</li>
+<li>SEO（metadata / Open Graph / 结构化数据）</li>
+</ul>
+<h3 id="54">5.4 集成</h3>
+<ul>
+<li>OAuth（Google / GitHub / Apple）</li>
+<li>支付（Stripe Checkout / Customer Portal）</li>
+<li>分析（Plausible / PostHog）</li>
+<li>邮件（Resend / SendGrid）</li>
+<li>其他第三方服务</li>
+</ul>
+<h3 id="55">5.5 错误处理 / 日志 / 监控</h3>
+<ul>
+<li>错误边界 / 全局异常处理</li>
+<li>日志策略（Sentry / LogRocket）</li>
+<li>性能监控（Web Vitals）</li>
+</ul>
+<h3 id="56">5.6 后台 / 管理端</h3>
+<ul>
+<li>老板看用户 / 看订单 / 看反馈的后台</li>
+<li>不复杂，可以简陋</li>
+</ul>
+<h3 id="57-gate">5.7 阶段内 Gate</h3>
+<ul>
+<li>每 2-3 天跑一次 Playwright e2e</li>
+<li>每个 Phase 子模块完成时拍板</li>
+</ul>
+<h3 id="58">5.8 老板的决策清单</h3>
+<ul>
+<li>设计拍板（颜色 / 字体 / Logo）</li>
+<li>文案拍板（landing / onboarding / email）</li>
+<li>定价拍板</li>
+<li>上线拍板</li>
+</ul>
+<hr />
+<h2 id="phase-6qa2-3">Phase 6：测试验证（QA，2-3 天）</h2>
+<h3 id="61">6.1 单元测试</h3>
+<ul>
+<li>后端 API（Vitest / Jest）</li>
+<li>前端组件（React Testing Library）</li>
+<li>工具函数 / 业务逻辑</li>
+</ul>
+<h3 id="62-e2e">6.2 E2E 测试</h3>
+<ul>
+<li>Playwright</li>
+<li>覆盖核心流程（注册 / 付费 / 核心功能）</li>
+<li>跨浏览器 / 跨设备测试</li>
+</ul>
+<h3 id="63">6.3 性能测试</h3>
+<ul>
+<li>Lighthouse（桌面 / 移动）</li>
+<li>Core Web Vitals</li>
+<li>资源大小 / 加载时间</li>
+<li>CDN / 缓存策略</li>
+</ul>
+<h3 id="64">6.4 安全测试</h3>
+<ul>
+<li>HTTPS / HSTS / CSP / X-Frame-Options</li>
+<li>OWASP Top 10 自查</li>
+<li>输入验证 / SQL 注入 / XSS</li>
+<li>CSRF / 点击劫持</li>
+</ul>
+<h3 id="65">6.5 兼容性测试</h3>
+<ul>
+<li>浏览器：Chrome / Safari / Firefox / Edge</li>
+<li>设备：iOS / Android / iPad / Desktop</li>
+<li>屏幕尺寸：1440p / 1920p / 移动 / 平板</li>
+</ul>
+<h3 id="66-ab">6.6 A/B 测试（如适用）</h3>
+<ul>
+<li>Landing page 标题 / CTA</li>
+<li>定价方案 / 套餐顺序</li>
+<li>Onboarding 流程</li>
+</ul>
+<h3 id="67-phase-6-gate">6.7 Phase 6 Gate</h3>
+<ul>
+<li><strong>继续条件</strong>：所有测试通过 / 性能达标 / 安全通过</li>
+<li><strong>暂停条件</strong>：重大 bug / 性能不达标 / 安全漏洞 → <strong>回 Phase 5 修</strong></li>
+</ul>
+<hr />
+<h2 id="phase-7deploy1-2">Phase 7：部署上线（Deploy，1-2 天）</h2>
+<h3 id="71-dns-ssl">7.1 域名 / DNS / SSL</h3>
+<ul>
+<li>域名购买（Namecheap / Porkbun / Cloudflare Registrar）</li>
+<li>DNS 配置（A / CNAME / MX）</li>
+<li>SSL 证书（Let's Encrypt / Cloudflare）</li>
+<li>子域名规划（www / app / api / cdn）</li>
+</ul>
+<h3 id="72">7.2 服务器部署</h3>
+<ul>
+<li>Vercel / Cloudflare Pages / 自建</li>
+<li>环境变量配置</li>
+<li>数据库迁移</li>
+<li>CDN 配置（Cloudflare）</li>
+</ul>
+<h3 id="73-cicd">7.3 CI/CD</h3>
+<ul>
+<li>GitHub Actions</li>
+<li>自动化测试 → 自动部署</li>
+<li>Preview 环境（每个 PR 都有预览 URL）</li>
+</ul>
+<h3 id="74-seo">7.4 SEO / 收录</h3>
+<ul>
+<li>GSC（Google Search Console）提交</li>
+<li>BM（Google Business Profile）配置（如适用）</li>
+<li>sitemap.xml / robots.txt</li>
+<li>结构化数据（JSON-LD）</li>
+<li>Open Graph / Twitter Card</li>
+</ul>
+<h3 id="75">7.5 上线检查清单</h3>
+<ul>
+<li>[ ] 域名能访问</li>
+<li>[ ] HTTPS 工作</li>
+<li>[ ] 主流程跑通</li>
+<li>[ ] 支付能跳通</li>
+<li>[ ] 邮件能发送</li>
+<li>[ ] 分析能埋点</li>
+<li>[ ] 监控能告警</li>
+<li>[ ] SEO 已提交</li>
+<li>[ ] 隐私政策 / 服务条款可访问</li>
+<li>[ ] Cookie Banner 显示</li>
+</ul>
+<h3 id="76">7.6 上线公告</h3>
+<ul>
+<li>Product Hunt / Twitter / LinkedIn / Reddit</li>
+<li>给种子用户发邀请邮件</li>
+<li>写一篇发布博文</li>
+</ul>
+<h3 id="77-phase-7-gate">7.7 Phase 7 Gate</h3>
+<ul>
+<li><strong>继续条件</strong>：上线清单全打勾</li>
+<li><strong>暂停条件</strong>：任一关键项失败 → <strong>回 Phase 6 修</strong></li>
+</ul>
+<hr />
+<h2 id="phase-8">Phase 8：运营监控（持续）</h2>
+<h3 id="81">8.1 数据监控</h3>
+<ul>
+<li>Plausible / Google Analytics</li>
+<li>关键指标：DAU / 转化率 / 留存 / NPS / 退款率</li>
+<li>每周一份数据报告</li>
+</ul>
+<h3 id="82">8.2 用户反馈</h3>
+<ul>
+<li>应用内反馈按钮</li>
+<li>邮件 / 社群收集</li>
+<li>每周整理需求 / bug</li>
+</ul>
+<h3 id="83">8.3 迭代优化</h3>
+<ul>
+<li>双周发一个版本</li>
+<li>每月写一篇 changelog</li>
+<li>每季度回顾策略</li>
+</ul>
+<h3 id="84">8.4 增长实验</h3>
+<ul>
+<li>SEO 内容营销</li>
+<li>Product Hunt 二次发布</li>
+<li>付费投放（如有预算）</li>
+</ul>
+<hr />
+<h2 id="phase-gate">跨阶段关键决策点（Phase Gate 总览）</h2>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Gate 检查</th>
+<th>拍板人</th>
+<th>决策周期</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Phase 1 结束</td>
+<td>赛道 + 竞品 + 合规可行</td>
+<td>老板</td>
+<td>0.5 天</td>
+</tr>
+<tr>
+<td>Phase 2 结束</td>
+<td>TOP 1 项目 + MSP 清晰</td>
+<td>老板</td>
+<td>0.5 天</td>
+</tr>
+<tr>
+<td>Phase 3 结束</td>
+<td>PRD 完整 / NFE 达标</td>
+<td>老板</td>
+<td>0.5 天</td>
+</tr>
+<tr>
+<td>Phase 4 结束</td>
+<td>技术栈可执行 / 服务可接</td>
+<td>老板 + 技术</td>
+<td>0.5 天</td>
+</tr>
+<tr>
+<td>Phase 5 结束</td>
+<td>主流程跑通 / UI 通过</td>
+<td>老板</td>
+<td>0.5 天</td>
+</tr>
+<tr>
+<td>Phase 6 结束</td>
+<td>所有测试通过</td>
+<td>老板 + QA</td>
+<td>0.5 天</td>
+</tr>
+<tr>
+<td>Phase 7 结束</td>
+<td>上线清单全勾</td>
+<td>老板</td>
+<td>0.5 天</td>
+</tr>
+<tr>
+<td>持续</td>
+<td>周数据 / 月复盘</td>
+<td>老板</td>
+<td>持续</td>
+</tr>
+</tbody>
+</table>
+<p><strong>总决策时间</strong>：约 3 天（零散的、可并行）</p>
+<hr />
+<h2 id="phase">关键风险与应对（按 Phase）</h2>
+<h3 id="phase-1">Phase 1 风险</h3>
+<table>
+<thead>
+<tr>
+<th>风险</th>
+<th>应对</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>选错赛道</td>
+<td>每个 Gate 都能终止，不浪费预算</td>
+</tr>
+<tr>
+<td>用户样本偏执</td>
+<td>强制采 3 个不同小厂</td>
+</tr>
+<tr>
+<td>合规不可行</td>
+<td>提前问"这个产品能做 ICP / GDPR 吗"</td>
+</tr>
+</tbody>
+</table>
+<h3 id="phase-2">Phase 2 风险</h3>
+<table>
+<thead>
+<tr>
+<th>风险</th>
+<th>应对</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>老板不熟悉赛道</td>
+<td>加"老板熟悉度"权重，直接放弃</td>
+</tr>
+<tr>
+<td>MSP 定义超复杂</td>
+<td>可保留双核功能，重新选</td>
+</tr>
+</tbody>
+</table>
+<h3 id="phase-3">Phase 3 风险</h3>
+<table>
+<thead>
+<tr>
+<th>风险</th>
+<th>应对</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>需求膨胀</td>
+<td>每天提交一次"需求变更"评估</td>
+</tr>
+<tr>
+<td>定价不收敛</td>
+<td>老板拍板为准</td>
+</tr>
+</tbody>
+</table>
+<h3 id="phase-4">Phase 4 风险</h3>
+<table>
+<thead>
+<tr>
+<th>风险</th>
+<th>应对</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>技术选型偏离老板能力</td>
+<td>选老板能改 / 能拉的社区</td>
+</tr>
+<tr>
+<td>第三方不可接</td>
+<td>提前注册 + 验证账号</td>
+</tr>
+</tbody>
+</table>
+<h3 id="phase-5">Phase 5 风险</h3>
+<table>
+<thead>
+<tr>
+<th>风险</th>
+<th>应对</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>设计拍板拖延</td>
+<td>只提供 2 个设计选项</td>
+</tr>
+<tr>
+<td>文案拍板拖延</td>
+<td>写 3 版由老板选</td>
+</tr>
+<tr>
+<td>集成耗时</td>
+<td>1 个 Phase 只接 1 个第三方</td>
+</tr>
+</tbody>
+</table>
+<h3 id="phase-6">Phase 6 风险</h3>
+<table>
+<thead>
+<tr>
+<th>风险</th>
+<th>应对</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E2E 不稳定</td>
+<td>优先写"状态稳定"的接口</td>
+</tr>
+<tr>
+<td>性能不达标</td>
+<td>压缩 / 缓存 / CDN</td>
+</tr>
+</tbody>
+</table>
+<h3 id="phase-7">Phase 7 风险</h3>
+<table>
+<thead>
+<tr>
+<th>风险</th>
+<th>应对</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DNS 解析慢</td>
+<td>提前 24h 改 DNS</td>
+</tr>
+<tr>
+<td>上线遗漏</td>
+<td>用上线 checklist 逐项打勾</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_1">老板的拍板时刻（什么时候必须拍板）</h2>
+<table>
+<thead>
+<tr>
+<th>时刻</th>
+<th>拍板内容</th>
+<th>不拍板的代价</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Phase 1 结束后</td>
+<td>"做不做这个赛道"</td>
+<td>浪费时间</td>
+</tr>
+<tr>
+<td>Phase 2 结束后</td>
+<td>"MSP 这个范围对不对"</td>
+<td>后阶段推翻</td>
+</tr>
+<tr>
+<td>Phase 3 结束后</td>
+<td>"PRD 范围对不对"</td>
+<td>编码返工</td>
+</tr>
+<tr>
+<td>Phase 4 结束后</td>
+<td>"技术栈对不对"</td>
+<td>集成返工</td>
+</tr>
+<tr>
+<td>Phase 5 关键设计点</td>
+<td>"Logo / 主页 / 定价"</td>
+<td>老板不喜欢</td>
+</tr>
+<tr>
+<td>Phase 6 结束后</td>
+<td>"可以上线"</td>
+<td>不可上线</td>
+</tr>
+<tr>
+<td>Phase 7 上线公告前</td>
+<td>"上线文案 / 调调"</td>
+<td>错过窗口期</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="agent-agent">Agent 工具链（这个 Agent 会调的工具）</h2>
+<h3 id="_2">调研类</h3>
+<ul>
+<li>Web 搜索（Google / Reddit / Product Hunt / G2）</li>
+<li>数据源（Similarweb / Statista / Crunchbase）</li>
+<li>文件读取 / 写入</li>
+</ul>
+<h3 id="_3">设计类</h3>
+<ul>
+<li>Figma / Draw.io / Mermaid</li>
+<li>颜色 / 字体 / Logo 生成</li>
+</ul>
+<h3 id="_4">编码类</h3>
+<ul>
+<li>脚手架（create-next-app / Vite）</li>
+<li>包管理（pnpm / yarn）</li>
+<li>测试（Vitest / Playwright）</li>
+<li>类型（TypeScript）</li>
+<li>Lint / Format</li>
+</ul>
+<h3 id="_5">部署类</h3>
+<ul>
+<li>GitHub</li>
+<li>Vercel CLI</li>
+<li>Cloudflare CLI</li>
+<li>DNS 管理</li>
+</ul>
+<h3 id="_6">第三方服务类</h3>
+<ul>
+<li>Stripe / Creem / Lemon Squeezy</li>
+<li>Supabase / Neon / PlanetScale</li>
+<li>Plausible / PostHog</li>
+<li>Resend / SendGrid</li>
+<li>Sentry / GlitchTip</li>
+</ul>
+<h3 id="_7">监控 / 运营类</h3>
+<ul>
+<li>Plausible / Google Analytics</li>
+<li>Sentry</li>
+<li>UptimeRobot / Better Stack</li>
+</ul>
+<hr />
+<h2 id="_8">时间总预算（一个完整产品）</h2>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>时间</th>
+<th>老板投入</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Phase 1（调研）</td>
+<td>3-5 天</td>
+<td>2h 拍板</td>
+</tr>
+<tr>
+<td>Phase 2（选项目）</td>
+<td>1-2 天</td>
+<td>2h 拍板</td>
+</tr>
+<tr>
+<td>Phase 3（PRD）</td>
+<td>2-3 天</td>
+<td>2h 拍板</td>
+</tr>
+<tr>
+<td>Phase 4（技术）</td>
+<td>1-2 天</td>
+<td>1h 拍板</td>
+</tr>
+<tr>
+<td>Phase 5（编码）</td>
+<td>5-10 天</td>
+<td>4h 拍板（设计 / 文案）</td>
+</tr>
+<tr>
+<td>Phase 6（测试）</td>
+<td>2-3 天</td>
+<td>1h 拍板</td>
+</tr>
+<tr>
+<td>Phase 7（部署）</td>
+<td>1-2 天</td>
+<td>1h 拍板</td>
+</tr>
+<tr>
+<td><strong>总计</strong></td>
+<td><strong>15-27 天</strong></td>
+<td><strong>约 13h 老板投入</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>适合 OPC</strong>：老板每天投入 &lt; 1 小时，主要拍板，其他 Agent 全干。</p>
+<hr />
+<h2 id="agent">下一步：怎么搭这个 Agent</h2>
+<p>基于这个工作流，搭这个 Agent 有 3 条路径：</p>
+<h3 id="amavis-agent5">路径 A：Mavis 内置 Agent（5 分钟搭）</h3>
+<ul>
+<li>优点：立刻能用 / 不需额外技术</li>
+<li>缺点：只能调用已有 skill，能力有限</li>
+</ul>
+<h3 id="bmavis-skill">路径 B：Mavis + 多 skill 串联（半天）</h3>
+<ul>
+<li>优点：能调用所有 skill / 较轻量</li>
+<li>缺点：要一个一个写 skill</li>
+</ul>
+<h3 id="c-claude-code-1-2">路径 C：独立 Claude Code 工作流（1-2 天）</h3>
+<ul>
+<li>优点：能力强 / 可跳出 Mavis</li>
+<li>缺点：要部署 / 需调优</li>
+</ul>
+<h3 id="_9">老板下一步可选：</h3>
+<ul>
+<li>[ ] 先用 MSP 路径（路径 A）跑一个最小闭环</li>
+<li>[ ] 一次性走完整路径（路径 B + 路径 C）</li>
+<li>[ ] 让我手搓一个能进 老板 Mavis 的 Claude Code 流程</li>
+</ul>
+<p>老板告诉我下一步怎么走，我直接动手。</p>
+<hr />
+<h2 id="a-phase">附录 A：交付物清单（每个 Phase 产出什么）</h2>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>交付物</th>
+<th>文件名样例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>市场调研报告</td>
+<td><code>01-市场大盘.md</code></td>
+</tr>
+<tr>
+<td>1</td>
+<td>用户画像</td>
+<td><code>02-用户画像.md</code></td>
+</tr>
+<tr>
+<td>1</td>
+<td>竞品地图</td>
+<td><code>03-竞品地图.md</code></td>
+</tr>
+<tr>
+<td>1</td>
+<td>合规清单</td>
+<td><code>04-合规清单.md</code></td>
+</tr>
+<tr>
+<td>1</td>
+<td>Phase 1 Gate</td>
+<td><code>00-GO-结构化记录.md</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>决策矩阵</td>
+<td><code>05-决策矩阵.md</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>MSP 定义</td>
+<td><code>06-MSP定义.md</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>用户故事</td>
+<td><code>07-PRD-用户故事.md</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>用户流程</td>
+<td><code>08-用户流程图.md</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>信息架构</td>
+<td><code>09-IA.md</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>验收标准</td>
+<td><code>10-验收标准.md</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>技术栈</td>
+<td><code>11-技术栈选型.md</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>架构图</td>
+<td><code>12-系统架构.md</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>数据模型</td>
+<td><code>13-数据模型.md</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>API 设计</td>
+<td><code>14-API设计.md</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>部署架构</td>
+<td><code>15-部署架构.md</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>项目代码</td>
+<td><code>src/...</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>组件库</td>
+<td><code>src/components/...</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>API 路由</td>
+<td><code>src/app/api/...</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>数据库迁移</td>
+<td><code>supabase/migrations/...</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>单元测试</td>
+<td><code>tests/unit/...</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>E2E 测试</td>
+<td><code>tests/e2e/...</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>测试报告</td>
+<td><code>测试报告.md</code></td>
+</tr>
+<tr>
+<td>7</td>
+<td>上线 URL</td>
+<td>https://example.com</td>
+</tr>
+<tr>
+<td>7</td>
+<td>上线检查</td>
+<td><code>上线检查清单.md</code></td>
+</tr>
+<tr>
+<td>7</td>
+<td>公告文案</td>
+<td><code>上线公告.md</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="b">附录 B：老板的决策日历（什么时候我顶多久）</h2>
+<table>
+<thead>
+<tr>
+<th>周次</th>
+<th>老板重点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第 1 周</td>
+<td>赛道拍板 + 竞品审批 + MSP 范围</td>
+</tr>
+<tr>
+<td>第 2 周</td>
+<td>PRD 范围 + 技术栈 + 设计方向</td>
+</tr>
+<tr>
+<td>第 3 周</td>
+<td>Logo / 主页 / 定价 / 文案</td>
+</tr>
+<tr>
+<td>第 4 周</td>
+<td>终拍板 + 上线公告</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<blockquote>
+<p><strong>下一步行动</strong>：老板点一个"请" / "继续" / "加细则"，我直接动手。</p>
+</blockquote>
+<hr />
+<p><em>文档版本：v1.0</em><br />
+<em>创建时间：2026-10-02</em><br />
+<em>作者：Mavis</em></p>
+</div>
+</body>
+</html>
